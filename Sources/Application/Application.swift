@@ -45,6 +45,7 @@ public class App {
         initializeProductRoutes(app: self)
         initializeAccessorySetRoutes(app: self)
         initializeAttributeRoutes(app: self)
+        initializeCartRoutes(app: self)
         KituraOpenAPI.addEndpoints(to: router)
     }
 
