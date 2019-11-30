@@ -40,7 +40,7 @@ extension App {
         }
     }
 
-    func selectHandler(completion: @escaping ([Product]?, RequestError?) -> Void) {
+    func selectHandler(completion: @escaping ([DisplayProduct]?, RequestError?) -> Void) {
         App.pool.getConnection() { connection, error in
             guard let connection = connection else {
                 Log.error("Error connecting: \(error?.localizedDescription ?? "Unknown Error")")
@@ -53,7 +53,7 @@ extension App {
                     return completion(nil, .internalServerError)
                 }
                 
-                var products = [Product]()
+                var products = [DisplayProduct]()
                 resultSet.forEach() { row, error in
                     guard let row = row else {
                         if let error = error {
@@ -64,17 +64,14 @@ extension App {
                             return completion(products, nil)
                         }
                     }
-                    guard let id = row[0] as? Int32,
-                        let fid = row[1] as? Int32,
-                        let uid = row[2] as? String,
-                        let name = row[3] as? String,
+                    guard let name = row[3] as? String,
                         let price = row[4] as? Double
 
                     else {
                         Log.error("Unable to decode product")
                         return completion(nil, .internalServerError)
                     }
-                    products.append(Product(id: id, fid: fid, uid: uid, name: name, price: price))
+                    products.append(DisplayProduct(name: name, price: price))
                 }
             }
         }
