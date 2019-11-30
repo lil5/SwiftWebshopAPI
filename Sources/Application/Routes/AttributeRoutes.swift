@@ -2,58 +2,53 @@ import KituraContracts
 import LoggerAPI
 import Foundation
 import SwiftKuery
-import SwiftKueryPostgreSQL
 
-func initializeKueryRoutes(app: App) {
-    app.router.post("/kuery", handler: app.insertHandler)
-    app.router.get("/kuery", handler: app.selectHandler)
+
+func initializeAttributeRoutes(app: App) {
+    app.router.post("/attributes", handler: app.insertAttributeHandler)
+    app.router.get("/attributes", handler: app.selectAttributeHandler)
 }
 
 extension App {
-    // Create connection pool and initialize BookTable here
-    static let poolOptions = ConnectionPoolOptions(initialCapacity: 1, maxCapacity: 5)
-    
-    static let pool = PostgreSQLConnection.createPool(host: "localhost", port: 54320, options: [.databaseName("mydb"), .userName("kitura"), .password("password")], poolOptions: poolOptions)
-
 
        // Create table instance here
     
-    static let productTable = ProductTable()
+    static let attributeTable = AttributeTable()
     
-    func insertHandler(product: Product, completion: @escaping (Product?, RequestError?) -> Void) {
+    func insertAttributeHandler(attribute: Attribute, completion: @escaping (Attribute?, RequestError?) -> Void) {
         // Handle POST here
-        let rows = [[product.id, product.fid, product.uid, product.name, product.price]]
+        let rows = [[attribute.id, attribute.fid, attribute.uid, attribute.name, attribute.price]]
         App.pool.getConnection() { connection, error in
             guard let connection = connection else {
                 Log.error("Error connecting: \(error?.localizedDescription ?? "Unknown Error")")
                 return completion(nil, .internalServerError)
             }
             // Write query and execute it here
-            let insertQuery = Insert(into: App.productTable, rows: rows)
+            let insertQuery = Insert(into: App.attributeTable, rows: rows)
             connection.execute(query: insertQuery) { insertResult in
                 guard insertResult.success else {
                     Log.error("Error executing query: \(insertResult.asError?.localizedDescription ?? "Unknown Error")")
                     return completion(nil, .internalServerError)
                 }
-                completion(product, nil)
+                completion(attribute, nil)
             }
         }
     }
 
-    func selectHandler(completion: @escaping ([DisplayProduct]?, RequestError?) -> Void) {
+    func selectAttributeHandler(completion: @escaping ([DisplayAttribute]?, RequestError?) -> Void) {
         App.pool.getConnection() { connection, error in
             guard let connection = connection else {
                 Log.error("Error connecting: \(error?.localizedDescription ?? "Unknown Error")")
                 return completion(nil, .internalServerError)
             }
-            let selectQuery = Select(from: App.productTable)
+            let selectQuery = Select(from: App.attributeTable)
             connection.execute(query: selectQuery) { selectResult in
                 guard let resultSet = selectResult.asResultSet else {
                     Log.error("Error connecting: \(selectResult.asError?.localizedDescription ?? "Unknown Error")")
                     return completion(nil, .internalServerError)
                 }
                 
-                var products = [DisplayProduct]()
+                var attributes = [DisplayAttribute]()
                 resultSet.forEach() { row, error in
                     guard let row = row else {
                         if let error = error {
@@ -61,7 +56,7 @@ extension App {
                             return completion(nil, .internalServerError)
                         } else {
                             // All rows have been processed
-                            return completion(products, nil)
+                            return completion(attributes, nil)
                         }
                     }
                     guard let name = row[3] as? String,
@@ -71,7 +66,7 @@ extension App {
                         Log.error("Unable to decode product")
                         return completion(nil, .internalServerError)
                     }
-                    products.append(DisplayProduct(name: name, price: price))
+                    attributes.append(DisplayAttribute(name: name, price: price))
                 }
             }
         }

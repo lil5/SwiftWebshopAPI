@@ -8,7 +8,8 @@ import Health
 import KituraOpenAPI
 import Dispatch
 import KituraCORS
-
+import SwiftKuery
+import SwiftKueryPostgreSQL
 
 public let projectPath = ConfigurationManager.BasePath.project.path
 public let health = Health()
@@ -20,6 +21,10 @@ let options = Options(
 let cors = CORS(options: options)
 
 public class App {
+    static let poolOptions = ConnectionPoolOptions(initialCapacity: 1, maxCapacity: 5)
+    
+    static let pool = PostgreSQLConnection.createPool(host: "localhost", port: 54320, options: [.databaseName("mydb"), .userName("kitura"), .password("password")], poolOptions: poolOptions)
+    
     let workerQueue = DispatchQueue(label: "worker")
     let router = Router()
     
@@ -37,7 +42,9 @@ public class App {
     func postInit() throws {
         // Endpoints
         initializeHealthRoutes(app: self)
-        initializeKueryRoutes(app: self)
+        initializeProductRoutes(app: self)
+        initializeAccessorySetRoutes(app: self)
+        initializeAttributeRoutes(app: self)
         KituraOpenAPI.addEndpoints(to: router)
     }
 
