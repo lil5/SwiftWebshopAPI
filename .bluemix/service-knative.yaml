@@ -1,0 +1,14 @@
+---
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: swiftrest
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+        - image: REGISTRY_URL/replace-me-namespace/swiftrest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080

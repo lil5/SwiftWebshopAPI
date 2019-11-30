@@ -1,0 +1,3 @@
+.build/							usr/src/SwiftRest
+terraform/scripts/install.sh	usr/src/SwiftRest
+terraform/scripts/start.sh		usr/src/SwiftRest
