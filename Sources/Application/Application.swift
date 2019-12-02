@@ -23,7 +23,16 @@ let cors = CORS(options: options)
 public class App {
     static let poolOptions = ConnectionPoolOptions(initialCapacity: 1, maxCapacity: 5)
     
-    static let pool = PostgreSQLConnection.createPool(host: "localhost", port: 54320, options: [.databaseName("mydb"), .userName("kitura"), .password("password")], poolOptions: poolOptions)
+    static let pool = PostgreSQLConnection.createPool(
+        host: "localhost",
+        port: 54320,
+        options: [
+            .databaseName("mydb"),
+            .userName("kitura"),
+            .password("password")
+        ],
+        poolOptions: poolOptions
+    )
     
     let workerQueue = DispatchQueue(label: "worker")
     let router = Router()
@@ -40,6 +49,8 @@ public class App {
     }
 
     func postInit() throws {
+        // ORM
+        initializeORMRoutes(app: self)
         // Endpoints
         initializeHealthRoutes(app: self)
         initializeProductRoutes(app: self)

@@ -22,3 +22,9 @@ struct Product: Codable {
         self.price = price
     }
 }
+
+extension Product: Modal {
+    public static func getConfigurations() -> Configuration? {
+        
+    }
+}

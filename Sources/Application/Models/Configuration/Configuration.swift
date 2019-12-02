@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Attribute: Codable {
+struct Configuration: Codable {
     let id: Int32
     let fid: Int32
     let uid: String
@@ -22,3 +22,5 @@ struct Attribute: Codable {
         self.price = price
     }
 }
+
+extension Configuration: Modal {}
